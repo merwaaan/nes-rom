@@ -1,0 +1,34 @@
+ <!doctype html>
+<head>
+  <meta charset="utf-8">
+	<script type="text/JavaScript" src="rom.js"></script>
+</head>
+<body>
+	
+	<input id="rom_file" type="file"/>
+	
+	<script>
+	window.addEventListener('load', function() {
+		
+		var input = document.getElementById("rom_file");
+		input.onchange = function() {
+		
+			var reader = new FileReader();
+			reader.onloadend = function() {
+				var hex = '';
+				for (var i = 0; i < this.result.length; i++) {
+					var byte = this.result.charCodeAt(i).toString(16);
+					if (byte.length < 2) {
+						byte = '0' + byte;
+					}
+					hex += ' ' + byte;
+				}
+				alert(hex);
+			};
+			
+			reader.readAsBinaryString(this.files[0]);
+		};
+	});
+	</script>
+</body>
+</html>
