@@ -10,20 +10,14 @@
 	<script>
 	window.addEventListener('load', function() {
 		
+		var rom = new Rom();
+		
 		var input = document.getElementById("rom_file");
 		input.onchange = function() {
 		
 			var reader = new FileReader();
 			reader.onloadend = function() {
-				var hex = '';
-				for (var i = 0; i < this.result.length; i++) {
-					var byte = this.result.charCodeAt(i).toString(16);
-					if (byte.length < 2) {
-						byte = '0' + byte;
-					}
-					hex += ' ' + byte;
-				}
-				alert(hex);
+				rom.load(this.result);
 			};
 			
 			reader.readAsBinaryString(this.files[0]);
