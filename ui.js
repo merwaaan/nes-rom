@@ -30,10 +30,12 @@ UI.prototype.show_chr = function() {
 				return (x < 16 ? '0' : '') + x.toString(16).toUpperCase();
 			}).join(' ');
 			
+			chr_section.appendChild(pattern_span);
+			
 			var canvas = document.createElement('canvas');
 			canvas.width = 8;
 			canvas.height = 8;
-			document.body.appendChild(canvas);
+			canvas.setAttribute('id', 'a');
 			
 			var ctx = canvas.getContext('2d');
 			var pixels = ctx.createImageData(canvas.width, canvas.height);
@@ -55,7 +57,9 @@ UI.prototype.show_chr = function() {
 			
 			ctx.putImageData(pixels, 0, 0);
 
-			chr_section.appendChild(pattern_span);
+			$(pattern_span).qtip({
+				content: $(canvas)
+			});
 		}
 		
 		document.body.appendChild(chr_section);
