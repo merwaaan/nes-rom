@@ -1,23 +1,27 @@
  <!doctype html>
 <head>
   <meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="screen.css"/>
 	<script type="text/JavaScript" src="rom.js"></script>
+	<script type="text/JavaScript" src="ui.js"></script>
 </head>
 <body>
 	
+	<h1></h1>
 	<input id="rom_file" type="file"/>
 	
 	<script>
 	window.addEventListener('load', function() {
 		
 		var rom = new Rom();
-		
+
 		var input = document.getElementById("rom_file");
 		input.onchange = function() {
 		
 			var reader = new FileReader();
 			reader.onloadend = function() {
 				rom.load(this.result);
+				new UI(rom);
 			};
 			
 			reader.readAsBinaryString(this.files[0]);

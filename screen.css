@@ -1,0 +1,38 @@
+section {
+	width: 50%;
+	min-height: 1em;
+	max-height: 15em;
+	padding: 0.5em;
+	overflow-y: scroll;
+	line-height: 1.5em;
+	border: 1px solid #DDD;
+	font-family: monospace;
+}
+
+section.chr {
+
+}
+
+section.chr span.pattern {
+	margin-right: 7px;
+}
+
+section.chr span.pattern:nth-child(5n) {
+	background: #FADDD7;
+}
+
+section.chr span.pattern:nth-child(5n+1) {
+	background: #FAF0D7;
+}
+
+section.chr span.pattern:nth-child(5n+2) {
+	background: #DAFAD7;
+}
+
+section.chr span.pattern:nth-child(5n+3) {
+	background: #D7F4FA;
+}
+
+section.chr span.pattern:nth-child(5n+4) {
+	background: #EBD7FA;
+}
