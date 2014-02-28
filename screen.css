@@ -9,35 +9,32 @@ section {
 	font-family: monospace;
 }
 
-section.chr {
-
-}
-
-section.chr span.pattern {
+section span.block {
 	margin-right: 7px;
 }
 
-section.chr span.pattern:nth-child(5n) {
+section span.block:hover {
+	cursor: help;
+}
+
+/* http://www.colourlovers.com/palette/3261255/Bookkeeping_Service */
+
+section span.block:nth-child(5n) {
 	background: #FADDD7;
 }
 
-section.chr span.pattern:nth-child(5n+1) {
+section span.block:nth-child(5n+1) {
 	background: #FAF0D7;
 }
 
-section.chr span.pattern:nth-child(5n+2) {
+section span.block:nth-child(5n+2) {
 	background: #DAFAD7;
 }
 
-section.chr span.pattern:nth-child(5n+3) {
+section span.block:nth-child(5n+3) {
 	background: #D7F4FA;
 }
 
-section.chr span.pattern:nth-child(5n+4) {
+section span.block:nth-child(5n+4) {
 	background: #EBD7FA;
-}
-
-canvas {
-	width: 200px;
-	height: 200px;
-}
+}	

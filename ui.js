@@ -19,8 +19,36 @@ UI.prototype.show_header = function() {
 	var header_section = document.createElement('section');
 	header_section.setAttribute('class', 'header');
 
+	this.header_block(0, 4, 'test', header_section);
+	this.header_block(4, 1, 'test', header_section);
+	this.header_block(5, 1, 'test', header_section);
+	this.header_block(6, 1, 'test', header_section);
+	this.header_block(7, 1, 'test', header_section);
+	this.header_block(8, 1, 'test', header_section);
+	this.header_block(9, 1, 'test', header_section);
+	this.header_block(10, 1, 'test', header_section);
+	this.header_block(11, 5, 'test', header_section);
 	
 	document.body.appendChild(header_section);
+}
+
+UI.prototype.header_block = function(address, size, comment, container) {
+
+	var span = document.createElement('span');
+	span.setAttribute('class', 'block');
+	span.innerHTML = this.rom.data.slice(address, address + size).map(function(x) {
+		return (x < 16 ? '0' : '') + x.toString(16).toUpperCase();
+	}).join(' ');
+	
+	container.appendChild(span);
+	
+	$(span).qtip({
+		content: {text: comment},
+		style: {classes: 'qtip-tipsy'},
+		position: {my: 'top center', at: 'bottom center'}
+	});
+
+	return span;
 }
 
 UI.prototype.show_trainer = function() {
@@ -85,7 +113,7 @@ UI.prototype.show_chr = function() {
 		for (var j = 0; j < 8192; j += 16) {
 		
 			var pattern_span = document.createElement('span');
-			pattern_span.setAttribute('class', 'pattern');
+			pattern_span.setAttribute('class', 'block');
 			
 			var pattern = this.rom.data.slice(address+j, address+j+16);
 			
@@ -95,7 +123,7 @@ UI.prototype.show_chr = function() {
 			
 			chr_section.appendChild(pattern_span);
 			
-			var canvas = this.draw_pattern(pattern, 4);
+			var canvas = this.draw_pattern(pattern, 15);
 			
 			$(pattern_span).qtip({
 				content: $(canvas),
