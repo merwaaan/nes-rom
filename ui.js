@@ -2,19 +2,82 @@ function UI(rom) {
 
 	this.rom = rom;
 	
+	this.show_header();
+	this.show_trainer();
 	this.show_prg();
 	this.show_chr();
 }
 
+UI.prototype.show_header = function() {
+
+	var header_title = document.createElement('h2');
+	header_title.innerHTML = 'Header (hover to see content)';
+	document.body.appendChild(header_title);
+	
+	var address = this.rom.addresses['header'];
+	
+	var header_section = document.createElement('section');
+	header_section.setAttribute('class', 'header');
+
+	
+	document.body.appendChild(header_section);
+}
+
+UI.prototype.show_trainer = function() {
+
+	if (this.rom.has_trainer) {
+	
+		var trainer_title = document.createElement('h2');
+		trainer_title.innerHTML = 'Trainer';
+		document.body.appendChild(trainer_title);
+		
+		var address = this.rom.addresses['trainer'];
+		
+		var trainer_section = document.createElement('section');
+		trainer_section.setAttribute('class', 'trainer');
+		
+		var trainer = this.rom.data.slice(address, address+512).map(function(x) {
+			return (x < 16 ? '0' : '') + x.toString(16).toUpperCase();
+		}).join(' ');
+		
+		trainer_section.innerHTML = trainer;
+		
+		document.body.appendChild(trainer_section);
+	}
+}
+
 UI.prototype.show_prg = function() {
 
+	for (var i = 0; i < this.rom.prg_rom_size; ++i) {
+	
+		var prg_title = document.createElement('h2');
+		prg_title.innerHTML = 'PRG '+i;
+		document.body.appendChild(prg_title);
+		
+		var address = this.rom.addresses['prg'][i];
+		
+		var prg_section = document.createElement('section');
+		prg_section.setAttribute('class', 'prg');
+		
+		var prg = this.rom.data.slice(address, address+16384).map(function(x) {
+			return (x < 16 ? '0' : '') + x.toString(16).toUpperCase();
+		}).join(' ');
+		
+		prg_section.innerHTML = prg;
+		
+		document.body.appendChild(prg_section);
+	}
 }
 
 UI.prototype.show_chr = function() {
 
 	for (var i = 0; i < this.rom.chr_rom_size; ++i) {
 	
-		var address = this.rom.addresses['chr'][i];
+		var chr_title = document.createElement('h2');
+		chr_title.innerHTML = 'CHR ' + i + (i == 0 ? ' (hover to see tiles)' : '');
+		document.body.appendChild(chr_title);
+		
+		var address = this.rom.addresses['chr'][i];	
 		
 		var chr_section = document.createElement('section');
 		chr_section.setAttribute('class', 'chr');
@@ -32,33 +95,12 @@ UI.prototype.show_chr = function() {
 			
 			chr_section.appendChild(pattern_span);
 			
-			var canvas = document.createElement('canvas');
-			canvas.width = 8;
-			canvas.height = 8;
-			canvas.setAttribute('id', 'a');
+			var canvas = this.draw_pattern(pattern, 4);
 			
-			var ctx = canvas.getContext('2d');
-			var pixels = ctx.createImageData(canvas.width, canvas.height);
-			
-			var pattern0 = pattern.slice(0, 8);
-			var pattern1 = pattern.slice(8, 16);
-			
-			for (var x = 0; x < 8; ++x) {
-				for (var y = 0; y < 8; ++y) {
-					var bit0 = (pattern0[y] >> (7-x)) & 1;
-					var bit1 = (pattern1[y] >> (7-x)) & 1;
-					var color = bit0 + (bit1 << 1);
-					pixels.data[(x + y*8)*4] = colors[color][0];
-					pixels.data[(x + y*8)*4 + 1] = colors[color][1];
-					pixels.data[(x + y*8)*4 + 2] = colors[color][2];
-					pixels.data[(x + y*8)*4 + 3] = 255;
-				}
-			}
-			
-			ctx.putImageData(pixels, 0, 0);
-
 			$(pattern_span).qtip({
-				content: $(canvas)
+				content: $(canvas),
+				style: {classes: 'qtip-tipsy'},
+				position: {my: 'left bottom', at: 'top right'}
 			});
 		}
 		
@@ -66,9 +108,38 @@ UI.prototype.show_chr = function() {
 	}
 }
 
+UI.prototype.draw_pattern = function(pattern, scale) {
+
+	scale = scale || 1;
+	
+	var pattern0 = pattern.slice(0, 8);
+	var pattern1 = pattern.slice(8, 16);
+	
+	var canvas = document.createElement('canvas');
+	canvas.width = 8 * scale;
+	canvas.height = 8 * scale;
+	canvas.setAttribute('id', 'a');
+	
+	var ctx = canvas.getContext('2d');
+	
+	for (var x = 0; x < 8; ++x) {
+		for (var y = 0; y < 8; ++y) {
+			
+			var bit0 = (pattern0[y] >> (7-x)) & 1;
+			var bit1 = (pattern1[y] >> (7-x)) & 1;
+			var color = bit0 + (bit1 << 1);
+			ctx.fillStyle = colors[color];
+			
+			ctx.fillRect(x * scale, y * scale, scale, scale);
+		}
+	}
+
+	return canvas;
+}
+
 var colors = [
-	[0, 0, 0],
-	[50, 50, 50],
-	[150, 150, 150],
-	[250, 250, 250]
+	'#FFFFFF',
+	'#FF0000',
+	'#00FF00',
+	'#0000FF'
 ];

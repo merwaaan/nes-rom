@@ -1,7 +1,7 @@
 section {
 	width: 50%;
 	min-height: 1em;
-	max-height: 15em;
+	max-height: 10em;
 	padding: 0.5em;
 	overflow-y: scroll;
 	line-height: 1.5em;
