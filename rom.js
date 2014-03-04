@@ -1,7 +1,9 @@
-function Rom() {
+function Rom(data) {
 
 	this.data = [];
 	this.addresses = {};
+	
+	this.load(data)
 }
 
 Rom.prototype.load = function(data) {

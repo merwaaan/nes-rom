@@ -1,5 +1,12 @@
-function UI(rom) {
+function UI() {
 
+	this.elements = [];
+}
+
+UI.prototype.show = function(rom) {
+
+	this.clear();
+	
 	this.rom = rom;
 	
 	this.show_header();
@@ -8,28 +15,44 @@ function UI(rom) {
 	this.show_chr();
 }
 
+UI.prototype.clear = function(rom) {
+
+	// Remove elements spawned previously + qtip elements
+	this.elements.concat([].slice.call(document.querySelectorAll('.qtip'))).map(function(element) {
+		element.parentNode.removeChild(element);
+	});
+	
+	this.elements = [];
+}
+
+UI.prototype.append = function(element) {
+
+	document.body.insertBefore(element, document.querySelector('#references'));
+	this.elements.push(element);
+}
+
 UI.prototype.show_header = function() {
 
 	var header_title = document.createElement('h2');
 	header_title.innerHTML = 'Header (hover to see content)';
-	document.body.appendChild(header_title);
+	this.append(header_title);
 	
 	var address = this.rom.addresses['header'];
 	
 	var header_section = document.createElement('section');
 	header_section.setAttribute('class', 'header');
 
-	this.header_block(0, 4, 'test', header_section);
-	this.header_block(4, 1, 'test', header_section);
-	this.header_block(5, 1, 'test', header_section);
-	this.header_block(6, 1, 'test', header_section);
-	this.header_block(7, 1, 'test', header_section);
-	this.header_block(8, 1, 'test', header_section);
-	this.header_block(9, 1, 'test', header_section);
-	this.header_block(10, 1, 'test', header_section);
-	this.header_block(11, 5, 'test', header_section);
+	this.header_block(0, 4, 'Constant bytes ("NES" in ascii)', header_section);
+	this.header_block(4, 1, 'Number of 16 kB units of PRG ROM', header_section);
+	this.header_block(5, 1, 'Number of 8 kB units of CHR ROM', header_section);
+	this.header_block(6, 1, 'Flag 6', header_section);
+	this.header_block(7, 1, 'Flag 7', header_section);
+	this.header_block(8, 1, 'Number of 8 kB units of PRG RAM', header_section);
+	this.header_block(9, 1, 'Flag 9', header_section);
+	this.header_block(10, 1, 'Flag 10 (unofficial)', header_section);
+	this.header_block(11, 5, 'Padding', header_section);
 	
-	document.body.appendChild(header_section);
+	this.append(header_section);
 }
 
 UI.prototype.header_block = function(address, size, comment, container) {
@@ -45,7 +68,7 @@ UI.prototype.header_block = function(address, size, comment, container) {
 	$(span).qtip({
 		content: {text: comment},
 		style: {classes: 'qtip-tipsy'},
-		position: {my: 'top center', at: 'bottom center'}
+		position: {my: 'top left', at: 'bottom center'}
 	});
 
 	return span;
@@ -57,7 +80,7 @@ UI.prototype.show_trainer = function() {
 	
 		var trainer_title = document.createElement('h2');
 		trainer_title.innerHTML = 'Trainer';
-		document.body.appendChild(trainer_title);
+		this.append(trainer_title);
 		
 		var address = this.rom.addresses['trainer'];
 		
@@ -70,7 +93,7 @@ UI.prototype.show_trainer = function() {
 		
 		trainer_section.innerHTML = trainer;
 		
-		document.body.appendChild(trainer_section);
+		this.append(trainer_section);
 	}
 }
 
@@ -80,7 +103,7 @@ UI.prototype.show_prg = function() {
 	
 		var prg_title = document.createElement('h2');
 		prg_title.innerHTML = 'PRG '+i;
-		document.body.appendChild(prg_title);
+		this.append(prg_title);
 		
 		var address = this.rom.addresses['prg'][i];
 		
@@ -93,7 +116,7 @@ UI.prototype.show_prg = function() {
 		
 		prg_section.innerHTML = prg;
 		
-		document.body.appendChild(prg_section);
+		this.append(prg_section);
 	}
 }
 
@@ -103,7 +126,7 @@ UI.prototype.show_chr = function() {
 	
 		var chr_title = document.createElement('h2');
 		chr_title.innerHTML = 'CHR ' + i + (i == 0 ? ' (hover to see tiles)' : '');
-		document.body.appendChild(chr_title);
+		this.append(chr_title);
 		
 		var address = this.rom.addresses['chr'][i];	
 		
@@ -132,7 +155,7 @@ UI.prototype.show_chr = function() {
 			});
 		}
 		
-		document.body.appendChild(chr_section);
+		this.append(chr_section);
 	}
 }
 

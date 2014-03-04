@@ -14,20 +14,29 @@
 	<h1>Open a NES/Famicom ROM and see what's inside (iNES format)</h1>
 	<input id="rom_file" type="file"/>
 	
+	<section id="references">
+		<h3>References</h3>
+		<ul>
+			<li>http://nesdev.com/neshdr20.txt</li>
+			<li>http://wiki.nesdev.com/w/index.php/INES</li>
+		</ul>
+	</section>
+	
 	<script>
 	window.addEventListener('load', function() {
-		
-		var rom = new Rom();
 
+		var ui = new UI();
+		
 		var input = document.getElementById("rom_file");
 		input.onchange = function() {
 		
 			var reader = new FileReader();
+				
 			reader.onloadend = function() {
-				rom.load(this.result);
-				new UI(rom);
+				var rom = new Rom(this.result);
+				ui.show(rom);
 			};
-			
+
 			reader.readAsBinaryString(this.files[0]);
 		};
 	});
