@@ -12,7 +12,7 @@ input {
 	margin-bottom: 3em;
 }
 
-section:not(#references) {
+section:not(#about) {
 	width: 50%;
 	min-height: 1em;
 	max-height: 10em;
@@ -48,9 +48,9 @@ section span.block:nth-child(5n+3) {
 
 section span.block:nth-child(5n+4) {
 	background: #EBD7FA;
-}	
+}
 
-section#references {
+section#about {
 	padding: 0.5em;
 	font-family: monospace;
 }

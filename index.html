@@ -1,45 +1,55 @@
  <!doctype html>
 <head>
   <meta charset="utf-8">
-	<link rel="stylesheet" type="text/css" href="screen.css"/>
-	<link rel="stylesheet" type="text/css" href="http://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.css"/>
-	<script type="text/JavaScript" src="rom.js"></script>
-	<script type="text/JavaScript" src="rom.js"></script>
-	<script type="text/JavaScript" src="ui.js"></script>
-	<script type="text/JavaScript" src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
-	<script type="text/JavaScript" src="http://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.js"></script>
+  <title>TODO</title>
+
+  <script src="rom.js"></script>
+  <script src="rom.js"></script>
+  <script src="ui.js"></script>
+
+  <script src="lib/jquery-1.11.0.min.js"></script>
+  <script src="lib/jquery.qtip.min.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="screen.css"/>
+  <link rel="stylesheet" type="text/css" href="lib/jquery.qtip.min.css"/>
+
 </head>
 <body>
-	
-	<h1>Open a NES/Famicom ROM and see what's inside (iNES format)</h1>
-	<input id="rom_file" type="file"/>
-	
-	<section id="references">
-		<h3>References</h3>
-		<ul>
-			<li>http://nesdev.com/neshdr20.txt</li>
-			<li>http://wiki.nesdev.com/w/index.php/INES</li>
-		</ul>
-	</section>
-	
-	<script>
-	window.addEventListener('load', function() {
 
-		var ui = new UI();
-		
-		var input = document.getElementById("rom_file");
-		input.onchange = function() {
-		
-			var reader = new FileReader();
-				
-			reader.onloadend = function() {
-				var rom = new Rom(this.result);
-				ui.show(rom);
-			};
+  <h1>Open a NES/Famicom ROM and see what's inside</h1>
 
-			reader.readAsBinaryString(this.files[0]);
-		};
-	});
-	</script>
+  <input id="rom_file" type="file"/>
+
+  <section id="about">
+    <h3>References</h3>
+    <ul>
+      <li><a href="http://nesdev.com/neshdr20.txt">http://nesdev.com/neshdr20.txt</a></li>
+      <li><a href="http://wiki.nesdev.com/w/index.php/INES">http://wiki.nesdev.com/w/index.php/INES</a></li>
+    </ul>
+    <h3>Source code</h3>
+    <ul>
+      <li><a href="http://github.com/merwaaan/famicom-rom.js">http://github.com/merwaaan/famicom-rom.js</a></li>
+    </ul>
+  </section>
+
+  <script>
+
+  window.addEventListener('load', function() {
+
+    document.getElementById("rom_file").onchange = function() {
+
+      var reader = new FileReader();
+
+      reader.onloadend = function() {
+        ROM.load(this.result);
+        UI.show();
+      };
+
+      reader.readAsArrayBuffer(this.files[0]);
+    };
+
+  });
+
+  </script>
 </body>
 </html>
