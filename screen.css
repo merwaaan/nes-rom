@@ -26,6 +26,7 @@ section:not(#about) {
 
 section span.block {
 	margin-right: 7px;
+	cursor: help;
 }
 
 /* http://www.colourlovers.com/palette/3261255/Bookkeeping_Service */

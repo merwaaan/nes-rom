@@ -11,6 +11,13 @@ UI = (function() {
     '#0000FF'
   ];
 
+  var to_hex = function(data) {
+
+    return [].map.call(data, function(x) {
+      return (x < 16 ? '0' : '') + x.toString(16).toUpperCase();
+    }).join(' ');
+  };
+
   return {
 
     show: function() {
@@ -32,6 +39,8 @@ UI = (function() {
     },
 
     clear: function() {
+
+      // Remove the appended elements AND the qTips
 
       _elements.concat([].slice.call(document.querySelectorAll('.qtip'))).map(function(element) {
         element.parentNode.removeChild(element);
@@ -101,9 +110,7 @@ UI = (function() {
         var section = document.createElement('section');
         section.setAttribute('class', name);
 
-        section.innerHTML = [].map.call(data, function(x) {
-          return (x < 16 ? '0' : '') + x.toString(16).toUpperCase();
-        }).join(' ');
+        section.innerHTML = to_hex(data);
 
         this.append(section);
       }
@@ -133,6 +140,7 @@ UI = (function() {
           span.setAttribute('class', 'block');
 
           var pattern = chr.subarray(j, j + 16);
+          span.textContent = to_hex(pattern);
 
           section.appendChild(span);
 
