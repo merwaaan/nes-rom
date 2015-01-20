@@ -15,12 +15,20 @@ UI = (function() {
 
     show: function() {
 
+      // Remove everything
+
       this.clear();
 
+      // Generate the sections
+
       this.show_header();
-      this.show_trainer();
-      this.show_prg();
-      this.show_chr();
+
+      if (ROM.has_trainer)
+        this.show_section('trainer');
+
+      this.show_section('prg');
+
+      this.show_sprites();
     },
 
     clear: function() {
@@ -48,12 +56,12 @@ UI = (function() {
       var header_section = document.createElement('section');
       header_section.setAttribute('class', 'header');
 
-      this.header_block(0, 4, 'Constant bytes ("NES" in ascii)', header_section);
-      this.header_block(4, 1, 'Number of 16 kB units of PRG ROM (program)', header_section);
-      this.header_block(5, 1, 'Number of 8 kB units of CHR ROM (sprites)', header_section);
+      this.header_block(0, 4, 'Constant bytes ("NES\\n" in ascii)', header_section);
+      this.header_block(4, 1, 'Number of PRG banks (program)', header_section);
+      this.header_block(5, 1, 'Number of CHR banks (sprites)', header_section);
       this.header_block(6, 1, 'Flag 6', header_section);
       this.header_block(7, 1, 'Flag 7', header_section);
-      this.header_block(8, 1, 'Number of 8 kB units of PRG RAM', header_section);
+      this.header_block(8, 1, 'Number of PRG RAM banks', header_section);
       this.header_block(9, 1, 'Flag 9', header_section);
       this.header_block(10, 1, 'Flag 10 (unofficial)', header_section);
       this.header_block(11, 5, 'Padding', header_section);
@@ -65,7 +73,7 @@ UI = (function() {
 
       var block = document.createElement('span');
       block.setAttribute('class', 'block');
-      block.innerHTML = [].map.call(ROM.data['header'].content.subarray(address, address + size), function(x) {
+      block.innerHTML = [].map.call(ROM.data['header'].subarray(address, address + size), function(x) {
         return (x < 16 ? '0' : '') + x.toString(16).toUpperCase();
       }).join(' ');
 
@@ -78,90 +86,72 @@ UI = (function() {
       container.appendChild(block);
     },
 
-    show_trainer: function() {
+    show_section: function(name) {
 
-      if (ROM.has_trainer) {
+      // One section for each bank
 
-        var trainer = ROM.data['trainer'].content;
+      for (var i = 0; i < ROM.data[name].length; ++i) {
 
-        var trainer_title = document.createElement('h2');
-        trainer_title.innerHTML = 'Trainer';
-        this.append(trainer_title);
+        var data = ROM.data[name][i];
 
-        var trainer_section = document.createElement('section');
-        trainer_section.setAttribute('class', 'trainer');
+        var title = document.createElement('h2');
+        title.innerHTML = name.toUpperCase() + (ROM.data[name].length > 1 ? ' ' + i : '');
+        this.append(title);
 
-        trainer_section.innerHTML = [].map(trainer, function(x) {
+        var section = document.createElement('section');
+        section.setAttribute('class', name);
+
+        section.innerHTML = [].map.call(data, function(x) {
           return (x < 16 ? '0' : '') + x.toString(16).toUpperCase();
         }).join(' ');
 
-        this.append(trainer_section);
+        this.append(section);
       }
     },
 
-    show_prg: function() {
+    /**
+      * Sprites have special treatment: a thumbnail is displayed
+      * when hovering over the data blocks.
+      */
 
-      for (var i = 0; i < ROM.prg_rom_size; ++i) {
+    show_sprites: function() {
 
-        var prg = ROM.data['prg'][i].content;
+      for (var i = 0; i < ROM.chr_banks; ++i) {
 
-        var prg_title = document.createElement('h2');
-        prg_title.innerHTML = 'PRG ' + i;
-        this.append(prg_title);
+        var chr = ROM.data['chr'][i];
 
-        var prg_section = document.createElement('section');
-        prg_section.setAttribute('class', 'prg');
+        var title = document.createElement('h2');
+        title.innerHTML = 'CHR ' + i + (i == 0 ? ' (hover to see tiles)' : '');
+        this.append(title);
 
-        prg_section.innerHTML = [].map.call(prg, function(x) {
-          return (x < 16 ? '0' : '') + x.toString(16).toUpperCase();
-        }).join(' ');
-
-        this.append(prg_section);
-      }
-    },
-
-    show_chr: function() {
-
-      for (var i = 0; i < ROM.chr_rom_size; ++i) {
-
-        var chr = ROM.data['chr'][i].content;
-
-        var chr_title = document.createElement('h2');
-        chr_title.innerHTML = 'CHR ' + i + (i == 0 ? ' (hover to see tiles)' : '');
-        this.append(chr_title);
-
-        var chr_section = document.createElement('section');
-        chr_section.setAttribute('class', 'chr');
+        var section = document.createElement('section');
+        section.setAttribute('class', 'chr');
 
         for (var j = 0; j < 8192; j += 16) {
 
-          var pattern_span = document.createElement('span');
-          pattern_span.setAttribute('class', 'block');
+          var span = document.createElement('span');
+          span.setAttribute('class', 'block');
 
           var pattern = chr.subarray(j, j + 16);
 
-          pattern_span.innerHTML = [].map.call(pattern, function(x) {
-            return (x < 16 ? '0' : '') + x.toString(16).toUpperCase();
-          }).join(' ');
-
-          chr_section.appendChild(pattern_span);
+          section.appendChild(span);
 
           var canvas = this.draw_pattern(pattern, 15);
 
-          $(pattern_span).qtip({
+          // Add a bubble
+
+          $(span).qtip({
             content: $(canvas),
             style: {classes: 'qtip-tipsy'},
             position: {my: 'left bottom', at: 'top right'}
           });
         }
 
-        this.append(chr_section);
+        this.append(section);
       }
     },
 
     draw_pattern: function(pattern, scale) {
-
-      scale = scale || 1;
 
       var pattern0 = pattern.subarray(0, 8);
       var pattern1 = pattern.subarray(8, 16);
@@ -169,15 +159,14 @@ UI = (function() {
       var canvas = document.createElement('canvas');
       canvas.width = 8 * scale;
       canvas.height = 8 * scale;
-      canvas.setAttribute('id', 'a');
 
       var ctx = canvas.getContext('2d');
 
       for (var x = 0; x < 8; ++x) {
         for (var y = 0; y < 8; ++y) {
 
-          var bit0 = (pattern0[y] >> (7-x)) & 1;
-          var bit1 = (pattern1[y] >> (7-x)) & 1;
+          var bit0 = (pattern0[y] >> (7 - x)) & 1;
+          var bit1 = (pattern1[y] >> (7 - x)) & 1;
           var color = bit0 + (bit1 << 1);
           ctx.fillStyle = _colors[color];
 

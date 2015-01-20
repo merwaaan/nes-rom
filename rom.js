@@ -2,9 +2,17 @@ var ROM = (function() {
 
   'use strict';
 
+  /**
+   * All the ROM data
+   */
+
   var _buffer = null;
 
   return {
+
+    /**
+      * Views on the ROM data (one for each section)
+      */
 
     data: {},
 
@@ -12,30 +20,32 @@ var ROM = (function() {
 
       _buffer = new Uint8Array(buffer);
 
-      // Read
+      // Start with the header
 
-      var pos = this.read_header();
-      pos = this.read_trainer(pos);
-      pos = this.read_prg(pos);
-      pos = this.read_chr(pos);
-      this.read_title(pos);
+      var address = this.read_header();
+
+      // Read the other sections
+
+      if (this.has_trainer)
+        address = this.read_section('trainer', 1, 512, address);
+
+      address = this.read_section('prg', this.prg_banks, 16384, address);
+
+      address = this.read_section('chr', this.chr_banks, 8192, address);
     },
 
     read_header: function() {
 
-      var header = this.data['header'] = {
-        address: 0,
-        content: _buffer.subarray(0, 16)
-      };
+      var header = this.data['header'] = _buffer.subarray(0, 16);
 
-      this.constant = header.content.subarray(0, 4);
-      this.prg_rom_size = header.content[4];
-      this.chr_rom_size = header.content[5];
-      this.flag6 = header.content[6];
-      this.flag7 = header.content[7];
-      this.prg_ram_size = header.content[8];
-      this.flag9 = header.content[9];
-      this.flag10 = header.content[10];
+      this.constant = header.subarray(0, 4);
+      this.prg_banks = header[4];
+      this.chr_banks = header[5];
+      this.flag6 = header[6];
+      this.flag7 = header[7];
+      this.prg_ram_size = header[8];
+      this.flag9 = header[9];
+      this.flag10 = header[10];
 
       // Parse flags
 
@@ -47,49 +57,14 @@ var ROM = (function() {
       return 16;
     },
 
-    read_trainer: function(pos) {
+    read_section: function(name, banks, bank_size, address) {
 
-      if (this.has_trainer)
-        this.data['trainer'] = {
-          address: pos,
-          content: _buffer.subarray(pos, pos + 512)
-        };
+      this.data[name] = [];
 
-      return pos + (this.has_trainer ? 512 : 0);
-    },
+      for (var i = 0; i < banks; ++i)
+        this.data[name].push(_buffer.subarray(address + i * bank_size, address + (i + 1) * bank_size));
 
-    read_prg: function(pos) {
-
-      this.data['prg'] = [];
-
-      for (var i = 0; i < this.prg_rom_size; ++i)
-        this.data['prg'][i] = {
-          address: pos + i * 16384,
-          content: _buffer.subarray(pos + i * 16384, pos + (i + 1) * 16384)
-        };
-
-      return pos + this.prg_rom_size * 16384;
-    },
-
-    read_chr: function(pos) {
-
-      this.data['chr'] = [];
-
-      for (var i = 0; i < this.chr_rom_size; ++i)
-        this.data['chr'][i] = {
-          address: pos + i * 8192,
-          content: _buffer.subarray(pos + i * 8192, pos + (i + 1) * 8192)
-        };
-
-      return pos + this.chr_rom_size * 8192;
-    },
-
-    read_title: function(pos) {
-
-      //this.addresses['title'] = pos;
-
-      // TODO?
-      // ...
+      return address + banks * bank_size;
     }
 
   }

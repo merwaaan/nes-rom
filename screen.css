@@ -5,11 +5,11 @@ h1, h2 {
 }
 
 h1 {
-	margin-bottom: 2em;
+	margin-bottom: 1em;
 }
 
 input {
-	margin-bottom: 3em;
+	margin-bottom: 2em;
 }
 
 section:not(#about) {
