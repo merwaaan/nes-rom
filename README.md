@@ -1,4 +1,4 @@
-# NES rom explorer
+# NES rom viewer
 
 Open a Nintendo Entertainment System/Famicom ROM to take a peek at its insides. The interesting part is mostly the sprites stored in CHR ROM. Try it [here](http://merwanachibet.net/nes-rom/).
 
